@@ -1,0 +1,1765 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>DÁM ƯỚC MƠ, DÁM BƯỚC RA</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&family=Playfair+Display:ital,wght@0,600;0,700;0,800;0,900;1,400;1,600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-void: #02050f;
+      --bg-surface: rgba(8, 17, 40, 0.85);
+      --border-cyan: rgba(56, 189, 248, 0.28);
+      --primary-cyan: #38bdf8;
+      --primary-blue: #2563eb;
+      --accent-glow: #60a5fa;
+      --accent-gold: #fbbf24;
+      --accent-rose: #f43f5e;
+      --accent-emerald: #10b981;
+      --text-pure: #ffffff;
+      --text-lead: #f1f5f9;
+      --text-sub: #94a3b8;
+      --font-body: 'Plus Jakarta Sans', system-ui, sans-serif;
+      --font-title: 'Playfair Display', Georgia, serif;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { height: 100%; margin: 0; }
+
+    body {
+      background-color: var(--bg-void);
+      color: var(--text-lead);
+      font-family: var(--font-body);
+      line-height: 1.7;
+      overflow: hidden;
+      width: 100vw;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      user-select: none;
+      -webkit-font-smoothing: antialiased;
+      perspective: 1400px;
+    }
+
+    /* MÀN CHE RÈM KÉO HAI BÊN */
+    #curtainStage {
+      position: fixed;
+      inset: 0;
+      z-index: 9999;
+      display: flex;
+      pointer-events: auto;
+      transition: visibility 1.1s ease, opacity 0.8s ease;
+    }
+    .curtain-wing {
+      flex: 1;
+      height: 100%;
+      background: repeating-linear-gradient(90deg, rgba(10,28,57,.98) 0 7%, rgba(18,49,87,.96) 8%, rgba(4,15,36,.98) 13%, rgba(12,35,68,.98) 18%), linear-gradient(90deg, #061027, #0b2347 46%, #030a19);
+      box-shadow: inset 0 0 90px rgba(0, 0, 0, 0.85);
+      transition: transform 1.2s cubic-bezier(0.77, 0, 0.175, 1);
+    }
+    .curtain-left { border-right: 1px solid rgba(56, 189, 248, 0.35); }
+    .curtain-right { border-left: 1px solid rgba(56, 189, 248, 0.35); }
+
+    .curtain-content-overlay {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 10;
+      transition: opacity 0.5s ease, transform 0.5s ease;
+      pointer-events: none;
+    }
+
+    #curtainStage.curtain-opened .curtain-left { transform: translateX(-102%); }
+    #curtainStage.curtain-opened .curtain-right { transform: translateX(102%); }
+    #curtainStage.curtain-opened .curtain-content-overlay { opacity: 0; transform: scale(0.92); }
+    #curtainStage.curtain-opened { visibility: hidden; opacity: 0; pointer-events: none; }
+
+    .curtain-title {
+      font-family: var(--font-title);
+      font-size: clamp(38px, 5.5vw, 76px);
+      font-weight: 800;
+      line-height: 1.15;
+      color: #ffffff;
+      margin-bottom: 1.25rem;
+      text-align: center;
+      text-shadow: 0 0 35px rgba(56, 189, 248, 0.5);
+    }
+    .curtain-title span { color: var(--accent-gold); }
+
+    .curtain-quote {
+      font-style: italic;
+      color: var(--text-sub);
+      font-size: 1.2rem;
+      max-width: 650px;
+      text-align: center;
+      margin-bottom: 2.2rem;
+      line-height: 1.6;
+    }
+
+    .btn-curtain-play {
+      pointer-events: auto !important;
+      cursor: pointer !important;
+      padding: 1rem 3rem;
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: #02050f;
+      background: linear-gradient(90deg, #38bdf8, #2563eb);
+      border: none;
+      border-radius: 9999px;
+      box-shadow: 0 0 35px rgba(56, 189, 248, 0.6);
+      transition: all 0.25s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+    .btn-curtain-play:hover {
+      transform: scale(1.05);
+      box-shadow: 0 0 55px rgba(56, 189, 248, 0.9);
+    }
+
+    /* TRỤC QUANG HỌC DỌC & HALO CHUỘT */
+    .vertical-optic-axis {
+      position: fixed;
+      top: 0;
+      bottom: 0;
+      left: 50%;
+      width: 1px;
+      background: linear-gradient(180deg, transparent 0%, rgba(56, 189, 248, 0.35) 25%, rgba(56, 189, 248, 0.8) 50%, rgba(56, 189, 248, 0.35) 75%, transparent 100%);
+      transform: translateX(-50%);
+      pointer-events: none;
+      z-index: 2;
+      box-shadow: 0 0 16px rgba(56, 189, 248, 0.5);
+    }
+
+    .pointer-halo {
+      position: absolute;
+      left: 0;
+      top: 0;
+      z-index: 2;
+      width: 260px;
+      height: 260px;
+      border-radius: 50%;
+      pointer-events: none;
+      opacity: 0;
+      background: radial-gradient(circle, rgba(56,189,248,.12) 0%, rgba(56,189,248,.05) 28%, rgba(251,191,36,.02) 44%, transparent 72%);
+      mix-blend-mode: screen;
+      will-change: transform;
+      transition: opacity .35s ease;
+    }
+    .pointer-halo.visible { opacity: .85; }
+
+    #spaceCanvas {
+      position: fixed;
+      inset: 0;
+      width: 100vw;
+      height: 100vh;
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    /* HEADER */
+    header {
+      height: 64px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 2rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      z-index: 50;
+      backdrop-filter: blur(20px);
+      background: rgba(2, 5, 15, 0.85);
+    }
+
+    .brand-cluster {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      font-size: 0.95rem;
+      color: var(--primary-cyan);
+    }
+    .brand-bead {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--accent-gold);
+      box-shadow: 0 0 12px rgba(251, 191, 36, 0.8);
+    }
+
+    .header-ctrls { display: flex; align-items: center; gap: 0.6rem; }
+    .btn-header {
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      color: var(--text-lead);
+      border-radius: 8px;
+      padding: 0.4rem 0.85rem;
+      font-size: 0.8rem;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      transition: all 0.25s ease;
+      font-family: var(--font-body);
+    }
+    .btn-header:hover {
+      background: rgba(56, 189, 248, 0.2);
+      border-color: var(--primary-cyan);
+    }
+
+    /* SLIDE STAGE */
+    .slides-wrapper {
+      position: relative;
+      flex: 1;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1.5rem 2rem;
+      z-index: 10;
+      cursor: pointer;
+    }
+
+    .slide {
+      position: absolute;
+      width: 100%;
+      max-width: 1240px;
+      height: 100%;
+      max-height: 860px;
+      opacity: 0;
+      visibility: hidden;
+      transform: translateY(30px) scale(0.98);
+      transition: opacity 0.5s ease, transform 0.5s ease, visibility 0.5s;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 1.5rem;
+      overflow-y: auto;
+    }
+    .slide.active {
+      opacity: 1;
+      visibility: visible;
+      transform: translateY(0) scale(1);
+      z-index: 20;
+    }
+
+    /* HIỆU ỨNG TỪNG Ý */
+    .step-item {
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.55s ease, filter 0.55s ease, transform 0.45s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.35s ease, border-color 0.35s ease;
+      position: relative;
+    }
+    .step-item:not(.revealed) { transform: translateY(22px) scale(0.96); filter: blur(5px); }
+    .step-item.revealed { opacity: 0.9; visibility: visible; filter: blur(0px); transform: none; }
+    .step-item.active-step {
+      opacity: 1 !important;
+      border-color: var(--primary-cyan) !important;
+    }
+
+    /* CHỈ NHÔ LÊN / PHÓNG TO KHI NGƯỜI DÙNG CLICK TRỰC TIẾP VÀO KHUNG */
+    .step-item.manual-focus {
+      opacity: 1 !important;
+      transform: translateY(-8px) scale(1.03) translateZ(30px) !important;
+      border-color: var(--primary-cyan) !important;
+      box-shadow: 0 18px 45px rgba(56, 189, 248, 0.45), 0 0 25px rgba(56, 189, 248, 0.3) !important;
+      z-index: 30;
+    }
+
+    .slide-title {
+      font-family: var(--font-title);
+      font-size: 2.3rem;
+      line-height: 1.25;
+      color: #ffffff;
+      margin-bottom: 1.1rem;
+      font-weight: 700;
+      position: relative;
+    }
+
+    .part-capsule {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      font-weight: 800;
+      color: var(--primary-cyan);
+      background: rgba(56, 189, 248, 0.12);
+      border: 1px solid var(--border-cyan);
+      padding: 0.3rem 0.95rem;
+      border-radius: 9999px;
+      margin-bottom: 1rem;
+      width: fit-content;
+    }
+
+    .quote-cinematic-banner {
+      font-size: 1.2rem;
+      font-style: italic;
+      color: #f8fafc;
+      border-left: 4px solid var(--primary-cyan);
+      padding: 0.75rem 1.25rem;
+      margin-bottom: 1.4rem;
+      background: linear-gradient(90deg, rgba(56, 189, 248, 0.12), transparent);
+      border-radius: 0 10px 10px 0;
+      line-height: 1.65;
+    }
+
+    .paragraph-body {
+      font-size: 1.05rem;
+      color: var(--text-lead);
+      margin-bottom: 1.2rem;
+    }
+
+    .grid-duo {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1.25rem;
+      margin-top: 0.75rem;
+    }
+    .grid-trio {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.25rem;
+      margin-top: 0.75rem;
+    }
+
+    .neo-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-cyan);
+      border-radius: 14px;
+      padding: 1.5rem;
+      backdrop-filter: blur(16px);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      cursor: pointer;
+    }
+
+    .badge-sub {
+      font-size: 0.72rem;
+      font-weight: 800;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      padding: 0.2rem 0.65rem;
+      border-radius: 6px;
+      width: fit-content;
+      margin-bottom: 0.7rem;
+      background: rgba(56, 189, 248, 0.18);
+      color: var(--primary-cyan);
+    }
+
+    .card-title-lg {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: #ffffff;
+      margin-bottom: 0.65rem;
+    }
+
+    .card-content-p {
+      font-size: 0.95rem;
+      color: #cbd5e1;
+      line-height: 1.65;
+    }
+
+    .cinema-photo-card {
+      display: flex;
+      flex-direction: column;
+      border-radius: 14px;
+      overflow: hidden;
+      background: rgba(8, 17, 40, 0.9);
+      border: 1px solid var(--border-cyan);
+      box-shadow: 0 12px 35px rgba(0, 0, 0, 0.5);
+      cursor: pointer;
+    }
+    .cinema-photo-wrap {
+      width: 100%;
+      height: 195px;
+      position: relative;
+      overflow: hidden;
+    }
+    .cinema-photo-wrap img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.6s ease;
+    }
+    .cinema-photo-card:hover .cinema-photo-wrap img {
+      transform: scale(1.06);
+    }
+    .cinema-photo-wrap::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(180deg, transparent 50%, rgba(8, 17, 40, 1) 100%);
+    }
+    .cinema-card-body {
+      padding: 1.25rem;
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+    }
+
+    /* KHỐI NGHỆ THUẬT: CÂY TRE MỌC TỪ MĂNG & HOA NỞ RỰC RỠ */
+    .nature-art-container {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+      margin: 1rem 0;
+    }
+    .art-frame-bamboo, .art-frame-flower {
+      background: radial-gradient(circle at center, rgba(16, 185, 129, 0.15), rgba(2, 5, 15, 0.95));
+      border: 1px solid rgba(16, 185, 129, 0.35);
+      border-radius: 16px;
+      padding: 1.2rem;
+      position: relative;
+      overflow: hidden;
+      cursor: pointer;
+    }
+    .art-frame-flower {
+      background: radial-gradient(circle at center, rgba(244, 63, 94, 0.15), rgba(2, 5, 15, 0.95));
+      border-color: rgba(244, 63, 94, 0.35);
+    }
+    .svg-cinematic-bamboo, .svg-cinematic-flower { width: 100%; height: 230px; }
+
+    /* Hoạt họa Cây tre mọc vươn từ măng */
+    .bamboo-shoot-grow {
+      transform-origin: 160px 110px;
+      animation: growFromShoot 5s ease-in-out infinite alternate;
+    }
+    @keyframes growFromShoot {
+      0% { transform: scaleY(0.18) scaleX(1.3); }
+      40% { transform: scaleY(0.4) scaleX(1.1); }
+      100% { transform: scaleY(1) scaleX(1); }
+    }
+    .root-path-pulse { stroke-dasharray: 6; animation: rootPulseFlow 2.5s linear infinite; }
+    @keyframes rootPulseFlow { to { stroke-dashoffset: -24; } }
+
+    /* Hoạt họa Hoa nở ra đa tầng */
+    .flower-bloom-active {
+      transform-origin: 150px 120px;
+      animation: bloomPetals 5s ease-in-out infinite alternate;
+    }
+    @keyframes bloomPetals {
+      0% { transform: scale(0.3) rotate(-25deg); opacity: 0.6; }
+      50% { transform: scale(0.8) rotate(10deg); opacity: 0.9; }
+      100% { transform: scale(1.08) rotate(0deg); opacity: 1; }
+    }
+
+    /* FOOTER */
+    footer {
+      height: 68px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 2rem;
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+      z-index: 50;
+      background: rgba(2, 5, 15, 0.92);
+      backdrop-filter: blur(16px);
+    }
+    .btn-step {
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      color: var(--text-pure);
+      padding: 0.55rem 1.25rem;
+      border-radius: 9999px;
+      font-size: 0.85rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      transition: all 0.2s ease;
+    }
+    .btn-step:hover:not(:disabled) {
+      background: var(--primary-cyan);
+      color: #02050f;
+      border-color: var(--primary-cyan);
+    }
+    .btn-step:disabled { opacity: 0.3; cursor: not-allowed; }
+
+    .progress-line-track {
+      flex: 1;
+      max-width: 480px;
+      margin: 0 2rem;
+      height: 5px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 9999px;
+      overflow: hidden;
+    }
+    .progress-line-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--primary-blue), var(--primary-cyan));
+      width: 0%;
+      transition: width 0.35s ease;
+      box-shadow: 0 0 12px var(--primary-cyan);
+    }
+
+    .step-counter-tag {
+      font-size: 0.78rem;
+      font-weight: 700;
+      color: var(--primary-cyan);
+      background: rgba(56, 189, 248, 0.12);
+      border: 1px solid rgba(56, 189, 248, 0.3);
+      padding: 0.2rem 0.6rem;
+      border-radius: 6px;
+    }
+
+    /* TOC MODAL */
+    .toc-modal-wrap {
+      position: fixed;
+      inset: 0;
+      background: rgba(2, 5, 15, 0.94);
+      backdrop-filter: blur(14px);
+      z-index: 200;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+    }
+    .toc-modal-wrap.open { display: flex; }
+    .toc-modal-core {
+      background: #081433;
+      border: 1px solid var(--primary-cyan);
+      border-radius: 16px;
+      max-width: 840px;
+      width: 100%;
+      max-height: 85vh;
+      overflow-y: auto;
+      padding: 2rem;
+    }
+    .toc-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 0.75rem;
+      margin-top: 1.25rem;
+    }
+    .toc-item-btn {
+      padding: 0.75rem 1rem;
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 0.85rem;
+      transition: all 0.2s ease;
+    }
+    .toc-item-btn:hover {
+      background: rgba(56, 189, 248, 0.18);
+      border-color: var(--primary-cyan);
+      transform: translateX(4px);
+    }
+
+    @media (max-width: 800px) {
+      .grid-duo, .grid-trio, .nature-art-container { grid-template-columns: 1fr; }
+      .curtain-title { font-size: 2.2rem; }
+      .slide-title { font-size: 1.7rem; }
+      header, footer { padding: 0 1rem; }
+      .progress-line-track { margin: 0 0.5rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="vertical-optic-axis"></div>
+  <div class="pointer-halo" id="pointerHalo"></div>
+  <canvas id="spaceCanvas"></canvas>
+
+  <!-- MÀN CHE KHAI MÀN -->
+  <div id="curtainStage">
+    <div class="curtain-wing curtain-left"></div>
+    <div class="curtain-wing curtain-right"></div>
+    <div class="curtain-content-overlay">
+      <h1 class="curtain-title">DÁM ƯỚC MƠ,<br><span>DÁM BƯỚC RA</span></h1>
+      <div class="curtain-quote">“Mục tiêu là những bậc thang cụ thể, còn ước mơ chính là ngọn hải đăng chỉ hướng.”</div>
+      <button class="btn-curtain-play" id="btnPlayKeynote">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+        KHAI MÀN TRÌNH DIỄN
+      </button>
+    </div>
+  </div>
+
+  <!-- HEADER -->
+  <header>
+    <div class="brand-cluster">
+      <span class="brand-bead"></span>
+      <span>DÁM ƯỚC MƠ, DÁM BƯỚC RA</span>
+    </div>
+    <div style="font-size: 0.82rem; color: var(--text-sub); text-transform: uppercase; font-weight: 700; letter-spacing: 0.1em;" id="sectionLabelTop">
+      GIỚI THIỆU
+    </div>
+    <div class="header-ctrls">
+      <button class="btn-header" id="btnOpenTocModal">Mục lục (28 Slide)</button>
+      <button class="btn-header" id="btnToggleFullscreen">Toàn màn hình</button>
+    </div>
+  </header>
+
+  <!-- KHUNG SLIDES CHÍNH -->
+  <main class="slides-wrapper" id="slidesClickTrigger" title="Nhấp chuột bất kỳ đâu để tiếp tục trình chiếu">
+
+    <!-- SLIDE 1: BÌA CHÍNH (SỬA LỖI: BẤM NÚT LÀ CHUYỂN THẲNG QUA SLIDE 2) -->
+    <div class="slide active" data-section="GIỚI THIỆU" data-title="Bìa bài thuyết trình">
+      <div style="text-align: center; max-width: 960px; margin: 0 auto;">
+        <h1 class="slide-title" style="font-size: clamp(38px,5.8vw,80px); line-height: 1.1; margin-bottom: 1.5rem; background: linear-gradient(135deg, #ffffff 20%, #38bdf8 65%, #60a5fa 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
+          DÁM ƯỚC MƠ,<br>DÁM BƯỚC RA
+        </h1>
+        <p class="paragraph-body" style="font-size: 1.35rem; color: #94a3b8; max-width: 800px; margin: 0 auto 2.5rem;">
+          Hành trình thấu hiểu bản chất khát vọng, đập tan rào cản tâm lý vùng an toàn và dấn thân tự tay cầm lái vận mệnh
+        </p>
+        <div>
+          <!-- BẤM NÚT NÀY SẼ VÀO NGAY SLIDE 2 MÀ KHÔNG BỊ KẸT TỪNG Ý -->
+          <button class="btn-step" id="btnStartPresentation" onclick="event.stopPropagation(); goToSlide(1);" style="padding: 0.9rem 2.8rem; font-size: 1.1rem; background: var(--primary-cyan); color: #02050f;">
+            Bắt đầu bài thuyết trình →
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 2: PHẦN I - CÂU DẪN MỞ ĐẦU & ĐỊNH NGHĨA -->
+    <div class="slide" data-section="PHẦN I" data-title="Bản chất của ước mơ">
+      <div class="part-capsule step-item">PHẦN I — BẢN CHẤT CỦA ƯỚC MƠ VÀ Ý NGHĨA TỒN TẠI</div>
+      <h2 class="slide-title step-item">Ước mơ thực sự là gì?</h2>
+      
+      <div class="quote-cinematic-banner step-item">
+        “Trước khi bàn về việc theo đuổi ước mơ, ta cần hiểu đúng: Ước mơ thực sự là gì?”
+      </div>
+
+      <p class="paragraph-body step-item">
+        Ước mơ không chỉ là một ý niệm thoáng qua hay lời nói viển vông. Đó là những mong muốn, khát vọng tốt đẹp mà con người hướng tới, đi cùng với nỗ lực không ngừng để biến chúng thành hiện thực.
+      </p>
+
+      <div class="neo-card step-item" style="background: radial-gradient(circle at top right, rgba(37, 99, 235, 0.3), rgba(8, 17, 40, 0.95)); border-color: var(--primary-cyan);">
+        <div class="card-title-lg" style="color: var(--primary-cyan);">Hoài bão cá nhân & Lý tưởng lẽ sống</div>
+        <div class="card-content-p" style="font-size: 1.05rem;">
+          Đó là hoài bão cá nhân, là lý tưởng định hình lẽ sống của mỗi con người. Ước mơ chính là câu trả lời căn bản và sâu sắc nhất cho việc:
+          <div style="font-size: 1.35rem; font-weight: 800; color: #ffffff; margin-top: 0.65rem; text-shadow: 0 0 18px rgba(56, 189, 248, 0.6);">
+            “Ta muốn trở thành ai và muốn tạo ra giá trị gì cho cuộc đời này?”
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 3: PHẦN I - BA CẤP ĐỘ -->
+    <div class="slide" data-section="PHẦN I" data-title="Ba cấp độ tư duy">
+      <div class="part-capsule step-item">PHẦN I — BẢN CHẤT CỦA ƯỚC MƠ VÀ Ý NGHĨA TỒN TẠI</div>
+      <h2 class="slide-title step-item">Phân biệt ba cấp độ tư duy</h2>
+      <p class="paragraph-body step-item">Để không bị nhầm lẫn giữa mộng tưởng và lẽ sống đích thực, ta cần phân định rạch ròi ba cấp độ:</p>
+
+      <div class="grid-trio">
+        <div class="neo-card step-item">
+          <div class="badge-sub" style="background: rgba(148, 163, 184, 0.15); color: #cbd5e1;">CẤP ĐỘ 1</div>
+          <div class="card-title-lg">Ý muốn nhất thời (Wish)</div>
+          <div class="card-content-p">
+            Những ham muốn bộc phát, thụ động, đòi hỏi kết quả nhưng không kèm theo cam kết hành động hay sự trả giá. Thường tan biến nhanh chóng khi gặp thử thách đầu tiên.
+          </div>
+        </div>
+
+        <div class="neo-card step-item">
+          <div class="badge-sub" style="background: rgba(251, 191, 36, 0.18); color: var(--accent-gold);">CẤP ĐỘ 2</div>
+          <div class="card-title-lg">Mục tiêu hành động (Goal)</div>
+          <div class="card-content-p">
+            Những cột mốc cụ thể, có hạn định, có kế hoạch rõ ràng và đo lường được kết quả trong từng giai đoạn ngắn hạn hoặc trung hạn.
+          </div>
+        </div>
+
+        <div class="neo-card step-item" style="border-color: var(--primary-cyan); background: rgba(14, 165, 233, 0.15);">
+          <div class="badge-sub" style="background: var(--primary-cyan); color: #02050f;">CẤP ĐỘ 3</div>
+          <div class="card-title-lg">Ước mơ (Dream / Aspiration)</div>
+          <div class="card-content-p">
+            Khát vọng sâu thẳm gắn liền với lý tưởng sống, mang lại ý nghĩa tồn tại và truyền cảm hứng dài hạn cho toàn bộ hành trình sống của một con người.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 4: PHẦN I - BẬC THANG & HẢI ĐĂNG (ẢNH HẢI ĐĂNG THẬT) -->
+    <div class="slide" data-section="PHẦN I" data-title="Bậc thang & Ngọn hải đăng">
+      <div class="part-capsule step-item">PHẦN I — BẢN CHẤT CỦA ƯỚC MƠ VÀ Ý NGHĨA TỒN TẠI</div>
+      <h2 class="slide-title step-item">Mối tương quan: Bậc thang và Ngọn hải đăng</h2>
+
+      <div class="grid-duo step-item" style="align-items: center; margin-bottom: 1.25rem;">
+        <div class="cinema-photo-card" style="height: 220px;">
+          <div class="cinema-photo-wrap" style="height: 100%;">
+            <img src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1200&q=80" alt="Ngọn hải đăng thật chiếu sáng đại dương">
+          </div>
+        </div>
+        <div>
+          <div class="quote-cinematic-banner" style="margin-bottom: 0.8rem;">
+            “Mục tiêu là những bậc thang cụ thể, còn ước mơ chính là ngọn hải đăng chỉ hướng.”
+          </div>
+          <p class="paragraph-body" style="font-size: 0.95rem; margin-bottom: 0;">
+            Nếu không có ngọn hải đăng, bạn sẽ kiệt sức giữa những bậc thang không đích đến. Nếu thiếu đi những bậc thang cụ thể, ngọn hải đăng mãi chỉ là ảo ảnh xa xôi ngoài tầm với.
+          </p>
+        </div>
+      </div>
+
+      <div class="grid-duo">
+        <div class="neo-card step-item">
+          <div class="card-title-lg">Ý nghĩa của sự dấn thân và trả giá</div>
+          <div class="card-content-p">
+            Một ước mơ chỉ có giá trị thực khi đi kèm với tinh thần sẵn sàng dấn thân và chấp nhận trả giá bằng mồ hôi, thời gian, sự kiên trì và kỷ luật tự giác.
+          </div>
+        </div>
+        <div class="neo-card step-item">
+          <div class="card-title-lg">Ranh giới với mộng tưởng viễn vông</div>
+          <div class="card-content-p">
+            Ranh giới giữa một khát vọng sống đích thực với mộng tưởng viển vông chính là hành động: Mộng tưởng ngồi chờ phép màu, còn ước mơ bước đi từng ngày dù gian khó.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 5: PHẦN I - NGUYỄN NHẬT ÁNH VÀ TÔI LÀ BÊTÔ -->
+    <div class="slide" data-section="PHẦN I" data-title="Chiếc bàn là tinh thần">
+      <div class="part-capsule step-item">PHẦN I — BẢN CHẤT CỦA ƯỚC MƠ VÀ Ý NGHĨA TỒN TẠI</div>
+      <h2 class="slide-title step-item">Tại sao con người nhất định cần có ước mơ?</h2>
+
+      <div class="quote-cinematic-banner step-item">
+        “Vậy tại sao con người nhất định cần phải có ước mơ?”
+      </div>
+
+      <p class="paragraph-body step-item">
+        Trong tác phẩm nổi tiếng <em>Tôi là Bêtô</em>, nhà văn Nguyễn Nhật Ánh từng gửi gắm một hình ảnh ẩn dụ vô cùng tinh tế và giàu cảm xúc:
+      </p>
+
+      <div class="neo-card step-item" style="border-left: 4px solid var(--primary-cyan); background: radial-gradient(circle at center, rgba(30, 58, 138, 0.4), rgba(8, 17, 40, 0.9)); margin-bottom: 1.25rem;">
+        <div style="font-family: var(--font-title); font-size: 1.35rem; color: #fff; text-align: center;">
+          Ước mơ giống như “chiếc bàn là tinh thần giúp ủi phẳng những nếp nhăn của số phận”.
+        </div>
+      </div>
+
+      <div class="neo-card step-item">
+        <div class="card-content-p" style="font-size: 1.05rem;">
+          Cuộc sống vốn dĩ không bằng phẳng, luôn đầy rẫy những trắc trở, va vấp và âu lo khiến tâm hồn ta chùng xuống. Chính ước mơ nâng đỡ xúc cảm, nuôi dưỡng niềm tin trong trẻo và trở thành ngọn hải đăng thắp sáng con đường giữa đêm đen mịt mù, giúp con người không bị lạc lối trước giông bão cuộc đời.
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 6: PHẦN II - KIỀNG BA CHÂN -->
+    <div class="slide" data-section="PHẦN II" data-title="Kiềng ba chân tuổi trẻ">
+      <div class="part-capsule step-item">PHẦN II — VÌ SAO TUỔI TRẺ CẦN CÓ ƯỚC MƠ?</div>
+      <h2 class="slide-title step-item">Độ lớn của khát khao tuổi trẻ</h2>
+
+      <p class="paragraph-body step-item">
+        Tuổi trẻ không được đo bằng số năm tháng đã sống, mà được định nghĩa bằng độ lớn của khát khao. Ước mơ đối với tuổi trẻ tựa như thế <strong>“kiềng ba chân”</strong> vững chãi tạo nên cốt cách và bản lĩnh của một đời người:
+      </p>
+
+      <div class="grid-trio" style="margin-top: 1.5rem;">
+        <div class="neo-card step-item" style="text-align: center;">
+          <div style="width: 55px; height: 55px; border-radius: 50%; background: rgba(56, 189, 248, 0.15); border: 2px solid var(--primary-cyan); display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem; color: var(--primary-cyan); font-weight: 800; font-size: 1.2rem;">TRÍ</div>
+          <div class="card-title-lg">Kim chỉ nam định hướng</div>
+          <div class="card-content-p">Lọc lựa chọn, định hình tư duy, không trôi dạt vô định.</div>
+        </div>
+
+        <div class="neo-card step-item" style="text-align: center;">
+          <div style="width: 55px; height: 55px; border-radius: 50%; background: rgba(37, 99, 235, 0.15); border: 2px solid var(--accent-glow); display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem; color: var(--accent-glow); font-weight: 800; font-size: 1.2rem;">LỰC</div>
+          <div class="card-title-lg">Nguồn nội lực bền bỉ</div>
+          <div class="card-content-p">Sức mạnh nội tại kiên cường khi ngoại lực cạn kiệt.</div>
+        </div>
+
+        <div class="neo-card step-item" style="text-align: center;">
+          <div style="width: 55px; height: 55px; border-radius: 50%; background: rgba(251, 191, 36, 0.15); border: 2px solid var(--accent-gold); display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem; color: var(--accent-gold); font-weight: 800; font-size: 1.2rem;">THỜI</div>
+          <div class="card-title-lg">Đặc quyền vô giá</div>
+          <div class="card-content-p">Thời gian và khả năng phục hồi thần kỳ sau vấp ngã.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 7: PHẦN II - TRÍ & LỰC CHI TIẾT -->
+    <div class="slide" data-section="PHẦN II" data-title="Trí định hướng & Lực nội sinh">
+      <div class="part-capsule step-item">PHẦN II — VÌ SAO TUỔI TRẺ CẦN CÓ ƯỚC MƠ?</div>
+      <h2 class="slide-title step-item">Trí định hướng & Lực bền bỉ</h2>
+
+      <div class="grid-duo">
+        <div class="neo-card step-item">
+          <div class="badge-sub">1. KIM CHỈ NAM ĐỊNH HƯỚNG (TRÍ)</div>
+          <div class="card-title-lg">Lọc lựa chọn & Làm chủ hoàn cảnh</div>
+          <div class="card-content-p">
+            Trong một thế giới ngập tràn sự xao nhãng và cám dỗ, ước mơ đóng vai trò như một bộ lọc sắc bén. Nó giúp người trẻ biết rõ điều gì xứng đáng để đầu tư tâm sức, dũng cảm buông bỏ những điều không cần thiết, và kiên quyết không để bản thân bị cuốn theo áp lực của đám đông hay sự an bài thụ động của hoàn cảnh.
+          </div>
+        </div>
+
+        <div class="neo-card step-item">
+          <div class="badge-sub">2. NGUỒN NỘI LỰC BỀN BỈ (LỰC)</div>
+          <div class="card-title-lg">Động lực nội tại & Niềm tin sâu thẳm</div>
+          <div class="card-content-p">
+            Khi những lời tán dương, phần thưởng hào nhoáng hay sự thúc đẩy từ bên ngoài cạn kiệt, chỉ có niềm tin sâu thẳm vào ước mơ mới duy trì được sự kiên trì. Nó nhắc nhở ta lý do bắt đầu mỗi khi mỏi mệt, biến khó khăn thành lò luyện ý chí thay vì lý do để bỏ cuộc giữa chừng.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 8: PHẦN II - THỜI & VÍ DỤ BÁC SĨ -->
+    <div class="slide" data-section="PHẦN II" data-title="Thời & Ví dụ người bác sĩ">
+      <div class="part-capsule step-item">PHẦN II — VÌ SAO TUỔI TRẺ CẦN CÓ ƯỚC MƠ?</div>
+      <h2 class="slide-title step-item">Đặc quyền thời gian & Ví dụ người bác sĩ</h2>
+
+      <div class="neo-card step-item" style="margin-bottom: 1.25rem;">
+        <div class="badge-sub" style="background: rgba(251, 191, 36, 0.2); color: var(--accent-gold);">3. ĐẶC QUYỀN VÔ GIÁ CỦA TUỔI TRẺ (THỜI)</div>
+        <div class="card-title-lg">Dám thử, dám sai và định hình bản sắc</div>
+        <div class="card-content-p">
+          Tuổi trẻ sở hữu món quà quý giá nhất: Thời gian và biên độ phục hồi sau những vấp ngã. Đây là giai đoạn duy nhất ta có đặc quyền được phép thử sai, được đứng lên làm lại mà chưa phải gánh chịu quá nhiều ràng buộc nặng nề, từ đó nhào nặn nên bản sắc độc bản của chính mình.
+        </div>
+      </div>
+
+      <div class="neo-card step-item" style="border-left: 4px solid var(--primary-cyan); background: rgba(14, 165, 233, 0.1);">
+        <div class="card-title-lg" style="color: var(--primary-cyan);">Ví dụ minh chứng: Người trẻ khát khao trở thành bác sĩ</div>
+        <div class="card-content-p">
+          Một người trẻ nuôi ước mơ khoác lên mình chiếc áo blouse trắng sẽ tự giác miệt mài học tập trong phòng thí nghiệm thâu đêm, rèn luyện đức tính kiên nhẫn và chủ động tìm hiểu chuyên môn y khoa. Dù sau này hành trình có thể đổi hướng nếu nhận ra không phù hợp, thì tinh thần kỷ luật, lòng trắc ẩn và sự chủ động cầm lái số phận đã mãi mãi khắc sâu vào nhân cách của họ.
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 9: PHẦN III - MỞ ĐẦU VÙNG AN TOÀN -->
+    <div class="slide" data-section="PHẦN III" data-title="Cơ chế vùng an toàn">
+      <div class="part-capsule step-item">PHẦN III — CƠ CHẾ TÂM LÝ GIỮ CHÂN TA TRONG VÙNG AN TOÀN</div>
+      <h2 class="slide-title step-item">Nghịch lý của sự khởi đầu</h2>
+
+      <div class="quote-cinematic-banner step-item">
+        “Người trẻ chúng ta ngày nay thường không hề thiếu những ước mơ rực rỡ, nhưng điều chúng ta thiếu nhất lại chính là một bước chân khởi đầu.”
+      </div>
+
+      <p class="paragraph-body step-item">
+        Tại sao việc bước ra khỏi vùng an toàn lại khó khăn đến vậy? Bộ não con người được tiến hóa để ưu tiên sự sinh tồn và né tránh bất định. Đằng sau sự do dự kéo dài là ba cơ chế tâm lý vô hình nhưng vô cùng kiên cố đang giam cầm tiềm năng của chúng ta:
+      </p>
+
+      <div class="grid-trio">
+        <div class="neo-card step-item" style="text-align: center;">
+          <div class="badge-sub" style="background: rgba(244, 63, 94, 0.18); color: var(--accent-rose);">RÀO CẢN 1</div>
+          <div class="card-title-lg">Tâm lý sợ mất mát</div>
+          <div class="card-content-p">Loss Aversion</div>
+        </div>
+        <div class="neo-card step-item" style="text-align: center;">
+          <div class="badge-sub" style="background: rgba(251, 191, 36, 0.18); color: var(--accent-gold);">RÀO CẢN 2</div>
+          <div class="card-title-lg">Áp lực đồng trang lứa</div>
+          <div class="card-content-p">Peer Pressure & Phán xét</div>
+        </div>
+        <div class="neo-card step-item" style="text-align: center;">
+          <div class="badge-sub" style="background: rgba(168, 85, 247, 0.18); color: #c084fc;">RÀO CẢN 3</div>
+          <div class="card-title-lg">Ngụy trang cầu toàn</div>
+          <div class="card-content-p">Perfectionism & Status Quo</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 10: PHẦN III - LOSS AVERSION -->
+    <div class="slide" data-section="PHẦN III" data-title="Sợ thất bại (Loss Aversion)">
+      <div class="part-capsule step-item">PHẦN III — CƠ CHẾ TÂM LÝ GIỮ CHÂN TA TRONG VÙNG AN TOÀN</div>
+      <h2 class="slide-title step-item">1. Nỗi sợ thất bại và tâm lý sợ mất mát (Loss Aversion)</h2>
+
+      <div class="neo-card step-item" style="margin-bottom: 1.25rem;">
+        <div class="card-content-p" style="font-size: 1.12rem; color: #ffffff;">
+          Tâm lý học hành vi chỉ ra rằng: <strong>Cảm giác đau đớn khi mất đi một thứ gì đó luôn lớn gấp đôi niềm vui khi đạt được một thành quả có giá trị tương đương.</strong>
+        </div>
+      </div>
+
+      <div class="grid-duo">
+        <div class="neo-card step-item">
+          <div class="card-title-lg" style="color: var(--accent-rose);">Nỗi sợ uổng phí công sức</div>
+          <div class="card-content-p">
+            Chúng ta sợ dốc hết thời gian, tiền bạc, tâm huyết vào một dự án rồi nhận lại kết quả trắng tay. Nỗi ám ảnh về sự uổng phí khiến ta thà chọn dậm chân tại chỗ còn hơn đối diện với rủi ro.
+          </div>
+        </div>
+
+        <div class="neo-card step-item">
+          <div class="card-title-lg" style="color: var(--accent-rose);">Nỗi sợ đối diện sự vụng về ban đầu</div>
+          <div class="card-content-p">
+            Bất kỳ ai khi bắt đầu học một kỹ năng mới hay khởi xướng một lộ trình mới đều phải trải qua giai đoạn ngây ngô và vụng về. Cái tôi cá nhân sợ bị tổn thương khiến ta chùn bước trước những va vấp tất yếu.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 11: PHẦN III - PEER PRESSURE -->
+    <div class="slide" data-section="PHẦN III" data-title="Áp lực đồng trang lứa">
+      <div class="part-capsule step-item">PHẦN III — CƠ CHẾ TÂM LÝ GIỮ CHÂN TA TRONG VÙNG AN TOÀN</div>
+      <h2 class="slide-title step-item">2. Áp lực đồng trang lứa và nỗi sợ phán xét</h2>
+      <p class="paragraph-body step-item"><strong>(Peer Pressure &amp; Social Judgment)</strong></p>
+
+      <div class="neo-card step-item" style="margin-bottom: 1.25rem;">
+        <div class="card-content-p">
+          Mỗi tối khi lướt màn hình điện thoại, ta liên tục chứng kiến bạn bè đồng trang lứa khoe thành tích: người nhận học bổng danh giá, kẻ thăng tiến vượt bậc, người khởi nghiệp thành công vang dội.
+        </div>
+      </div>
+
+      <div class="neo-card step-item" style="border-left: 4px solid var(--accent-gold); background: rgba(251, 191, 36, 0.1); margin-bottom: 1rem;">
+        <div style="font-family: var(--font-title); font-size: 1.3rem; color: #fff; text-align: center;">
+          “Ta vô tình đem ‘tập phim hậu trường’ đầy vết xước, mệt mỏi và lúng túng của chính mình đi so sánh với ‘đoạn phim nổi bật’ (highlight reel) đã được cắt gọt, chỉnh sửa lung linh của người khác.”
+        </div>
+      </div>
+
+      <p class="paragraph-body step-item">
+        Hệ quả là ta sợ hãi ánh nhìn đánh giá từ thiên hạ, sợ bị coi là kẻ tụt hậu, và cuối cùng trao trọn quyền tự quyết số phận mình cho sự phán xét của xã hội.
+      </p>
+    </div>
+
+    <!-- SLIDE 12: PHẦN III - CẦU TOÀN -->
+    <div class="slide" data-section="PHẦN III" data-title="Ngụy trang cầu toàn">
+      <div class="part-capsule step-item">PHẦN III — CƠ CHẾ TÂM LÝ GIỮ CHÂN TA TRONG VÙNG AN TOÀN</div>
+      <h2 class="slide-title step-item">3. Sự ngụy trang tinh vi của chủ nghĩa cầu toàn</h2>
+      <p class="paragraph-body step-item"><strong>(Status Quo Bias &amp; Perfectionism)</strong></p>
+
+      <p class="paragraph-body step-item">
+        Chủ nghĩa cầu toàn thường không phải là tiêu chuẩn cao quý, mà là một tấm bình phong hoàn hảo để che giấu sự sợ hãi. Ta thường ru ngủ bản thân bằng những lời ngụy biện quen thuộc:
+      </p>
+
+      <div class="grid-trio">
+        <div class="neo-card step-item" style="border-left: 3px solid var(--accent-gold);">
+          <div class="card-title-lg">“Mình cần chuẩn bị kỹ hơn...”</div>
+          <div class="card-content-p">Thu thập tài liệu vô tận, lên kế hoạch chi tiết nhưng không bao giờ thực hiện dòng đầu tiên.</div>
+        </div>
+        <div class="neo-card step-item" style="border-left: 3px solid var(--accent-gold);">
+          <div class="card-title-lg">“Chờ khi có thời gian...”</div>
+          <div class="card-content-p">Trì hoãn vào một tương lai lý tưởng không có bận rộn – thời điểm sẽ không bao giờ xuất hiện.</div>
+        </div>
+        <div class="neo-card step-item" style="border-left: 3px solid var(--accent-gold);">
+          <div class="card-title-lg">“Chờ khi có cảm hứng dâng trào...”</div>
+          <div class="card-content-p">Ủy thác hành động cho cảm xúc thất thường thay vì xây dựng kỷ luật nội tại bền bỉ.</div>
+        </div>
+      </div>
+
+      <p class="paragraph-body step-item" style="margin-top: 1.25rem;">
+        Xu hướng duy trì hiện trạng (Status Quo Bias) khiến bộ não ưu tiên sự an nhàn quen thuộc, biến sự cầu toàn thành chiếc lồng giam êm ái né tránh thực tế nghiệt ngã.
+      </p>
+    </div>
+
+    <!-- SLIDE 13: PHẦN IV - LỘ TRÌNH THỰC CHIẾN (CHỈ CẦN 1 CLICK LÀ HIỆN CẢ 3 KHUNG 1-2-3 LẦN LƯỢT) -->
+    <div class="slide" data-section="PHẦN IV" data-title="Lộ trình thực chiến" data-auto-sequence="true">
+      <div class="part-capsule step-item">PHẦN IV — LỘ TRÌNH THỰC CHIẾN: BƯỚC RA KHỎI VÙNG AN TOÀN</div>
+      <h2 class="slide-title step-item">Lộ trình chiến lược và Kỷ luật thép</h2>
+
+      <div class="quote-cinematic-banner step-item">
+        “Để bước ra khỏi vùng an toàn không cần những cú nhảy liều lĩnh mù quáng, mà đòi hỏi một lộ trình chiến lược cùng kỷ luật thép.”
+      </div>
+
+      <p class="paragraph-body step-item">
+        Muốn phá vỡ bức tường quán tính, người trẻ cần trang bị bộ ba giải pháp hành động cụ thể, khoa học và có thể thực thi ngay lập tức:
+      </p>
+
+      <!-- KHỐI 3 BƯỚC: SẼ HIỆN 1-2-3 ĐỒNG LOẠT VỚI 1 LẦN CLICK DUY NHẤT -->
+      <div class="grid-trio auto-stagger-group">
+        <div class="neo-card step-item" style="transition-delay: 0.05s;">
+          <div class="badge-sub">BƯỚC 1</div>
+          <div class="card-title-lg">Calculated Risk</div>
+          <div class="card-content-p">Đón nhận rủi ro có tính toán & Coi thất bại là dữ liệu hiệu chỉnh.</div>
+        </div>
+        <div class="neo-card step-item" style="transition-delay: 0.25s;">
+          <div class="badge-sub">BƯỚC 2</div>
+          <div class="card-title-lg">Competence</div>
+          <div class="card-content-p">Tích lũy thực lực tương xứng với quy mô của khát vọng.</div>
+        </div>
+        <div class="neo-card step-item" style="transition-delay: 0.45s;">
+          <div class="badge-sub">BƯỚC 3</div>
+          <div class="card-title-lg">Micro-steps</div>
+          <div class="card-content-p">Đập tan ma sát bằng những vi bước tối thiểu mỗi ngày.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 14: PHẦN IV - BƯỚC 1: CALCULATED RISK -->
+    <div class="slide" data-section="PHẦN IV" data-title="Rủi ro có tính toán">
+      <div class="part-capsule step-item">PHẦN IV — LỘ TRÌNH THỰC CHIẾN: BƯỚC RA KHỎI VÙNG AN TOÀN</div>
+      <h2 class="slide-title step-item">1. Đón nhận rủi ro có tính toán (Calculated Risk)</h2>
+
+      <div class="neo-card step-item" style="border-left: 4px solid var(--primary-cyan); margin-bottom: 1.25rem;">
+        <div style="font-size: 1.15rem; font-weight: 700; color: #fff;">
+          Thất bại không phải là bản án chung thân, mà là dữ liệu quý giá để hiệu chỉnh hành trình.
+        </div>
+      </div>
+
+      <div class="grid-duo">
+        <div class="neo-card step-item">
+          <div class="card-title-lg">Ví dụ: Lần thuyết trình run rẩy</div>
+          <div class="card-content-p">
+            Một lần đứng trước đám đông thuyết trình bị run rẩy, quên lời hay ấp úng không phải là dấu chấm hết cho năng lực của bạn. Nó chính là tấm gương phản chiếu chính xác những lỗ hổng cần khắc phục.
+          </div>
+        </div>
+
+        <div class="neo-card step-item">
+          <div class="card-title-lg">Câu hỏi tự vấn trưởng thành</div>
+          <div class="card-content-p">
+            Thay vì tự trách bản thân, hãy tự vấn: “Lần sau mình cần chuẩn bị slide trực quan hơn ở điểm nào? Cần tập luyện trước gương bao nhiêu lần? Cần kiểm soát nhịp thở ra sao?” Khi được mổ xẻ rạch ròi, thất bại chính là bệ phóng vững chắc nhất.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 15: PHẦN IV - BƯỚC 2: TÍCH LŨY THỰC LỰC -->
+    <div class="slide" data-section="PHẦN IV" data-title="Tích lũy thực lực">
+      <div class="part-capsule step-item">PHẦN IV — LỘ TRÌNH THỰC CHIẾN: BƯỚC RA KHỎI VÙNG AN TOÀN</div>
+      <h2 class="slide-title step-item">2. Tích lũy thực lực tương xứng với khát vọng</h2>
+
+      <div class="neo-card step-item" style="border-left: 4px solid var(--primary-cyan); background: rgba(37, 99, 235, 0.15); margin-bottom: 1.25rem;">
+        <div style="font-family: var(--font-title); font-size: 1.3rem; color: #fff; text-align: center;">
+          “Ước mơ không có thực lực đi kèm chỉ là ảo tưởng; thực lực không có ước mơ dẫn đường sẽ thiếu đi ngọn lửa đột phá.”
+        </div>
+      </div>
+
+      <div class="grid-duo">
+        <div class="neo-card step-item">
+          <div class="card-title-lg">Giá trị tạo thành từ sản phẩm cụ thể</div>
+          <div class="card-content-p">
+            Xã hội không trả thưởng cho những ý niệm nằm yên trong đầu; giá trị thực tế chỉ được định hình thông qua những sản phẩm hữu hình, giải pháp cụ thể và kết quả có thể kiểm chứng được.
+          </div>
+        </div>
+
+        <div class="neo-card step-item">
+          <div class="card-title-lg">Sự nghiêm cẩn rèn luyện mỗi ngày</div>
+          <div class="card-content-p">
+            Thực lực không đến sau một đêm may mắn. Nó đòi hỏi sự trau dồi kiến thức chuyên môn sâu rộng, mài giũa kỹ năng thực chiến và thái độ làm việc nghiêm cẩn, chỉn chu từng chi tiết nhỏ nhất mỗi ngày.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 16: PHẦN IV - BƯỚC 3: ĐẬP TAN MA SÁT BẰNG VI BƯỚC -->
+    <div class="slide" data-section="PHẦN IV" data-title="Vi bước tối thiểu">
+      <div class="part-capsule step-item">PHẦN IV — LỘ TRÌNH THỰC CHIẾN: BƯỚC RA KHỎI VÙNG AN TOÀN</div>
+      <h2 class="slide-title step-item">3. Đập tan ma sát bằng những vi bước (Frictionless Micro-steps)</h2>
+
+      <p class="paragraph-body step-item">
+        Khi đối diện với một mục tiêu khổng lồ, bộ não sẽ rơi vào trạng thái quá tải, choáng ngợp và vô thức kích hoạt cơ chế phòng vệ để tìm cách thoái lui, trì hoãn. Bí quyết chiến thắng là hạ thấp ngưỡng hành động:
+      </p>
+
+      <div class="grid-duo">
+        <div class="neo-card step-item">
+          <div class="badge-sub">VÍ DỤ VI BƯỚC 1</div>
+          <div class="card-title-lg">Viết đúng 200 chữ mỗi sáng</div>
+          <div class="card-content-p">
+            Thay vì đặt mục tiêu viết một cuốn sách dày cộp, hãy ngồi vào bàn và viết trọn vẹn đúng 200 chữ mỗi sáng trước khi bắt đầu công việc khác.
+          </div>
+        </div>
+
+        <div class="neo-card step-item">
+          <div class="badge-sub">VÍ DỤ VI BƯỚC 2</div>
+          <div class="card-title-lg">Chống đẩy đúng 50 cái</div>
+          <div class="card-content-p">
+            Thay vì trì hoãn buổi tập gym hoàn hảo, hãy hạ người xuống sàn nhà và hoàn thành đủ 50 cái chống đẩy ngay tại phòng ngủ.
+          </div>
+        </div>
+      </div>
+
+      <div class="neo-card step-item" style="margin-top: 1.25rem; border-color: var(--primary-cyan);">
+        <div class="card-content-p" style="font-size: 1.05rem; color: #ffffff;">
+          <strong>Ý nghĩa cốt lõi:</strong> Những vi bước tối thiểu rèn luyện cho ta sự nhẫn nại phi thường. Đây chính là điểm phân định rạch ròi giữa cảm hứng bấp bênh nay còn mai mất và <strong>kỷ luật hành động bất chấp cảm xúc</strong>.
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 17: PHẦN V - DẪN CHỨNG 1: H'HEN NIÊ (ẢNH THẬT) -->
+    <div class="slide" data-section="PHẦN V" data-title="H'Hen Niê - Vượt định kiến">
+      <div class="part-capsule step-item">PHẦN V — LIÊN HỆ THỰC TẾ: TỪ ĐỈNH CAO ĐẾN ĐỜI THƯỜNG</div>
+      <h2 class="slide-title step-item">1. Vượt lên định kiến xã hội — H'Hen Niê</h2>
+
+      <div class="grid-duo" style="align-items: stretch;">
+        <div class="cinema-photo-card step-item">
+          <div class="cinema-photo-wrap" style="height: 200px;">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/68/H%27Hen_Ni%C3%AA_at_Vietnam_International_Fashion_Week_2018.png/640px-H%27Hen_Ni%C3%AA_at_Vietnam_International_Fashion_Week_2018.png" alt="Hoa hậu H'Hen Niê thật">
+          </div>
+          <div class="cinema-card-body">
+            <div class="badge-sub">BỐI CẢNH & THỬ THÁCH</div>
+            <div class="card-title-lg">Buôn làng nghèo khó & Hủ tục tảo hôn</div>
+            <div class="card-content-p">
+              Sinh ra và lớn lên trong buôn làng nghèo khó của người đồng bào Ê Đê, nơi những khuôn mẫu định kiến ngàn đời mặc định người con gái phải lập gia đình sớm từ năm 14 tuổi. Áp lực của hoàn cảnh tưởng chừng đã định đoạt số phận của cô gái nhỏ.
+            </div>
+          </div>
+        </div>
+
+        <div class="neo-card step-item" style="border-color: var(--primary-cyan); background: rgba(14, 165, 233, 0.12); justify-content: center;">
+          <div class="badge-sub" style="background: var(--primary-cyan); color: #02050f;">BẢN LĨNH BƯỚC RA</div>
+          <div class="card-title-lg" style="font-size: 1.35rem;">Tự viết lại cuộc đời trên đấu trường quốc tế</div>
+          <div class="card-content-p" style="font-size: 1.05rem;">
+            Nhưng H'Hen Niê đã dũng cảm nói không với sự an bài. Bằng lòng can đảm vượt khỏi khuôn mẫu, cô kiên trì theo đuổi con đường học vấn, tự bươn chải để viết lại trang sách cuộc đời mình. Để rồi bước lên đỉnh vinh quang với danh hiệu Hoa hậu Hoàn vũ Việt Nam và xuất sắc ghi tên mình vào Top 5 Miss Universe thế giới, truyền cảm hứng mạnh mẽ cho hàng triệu con người.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 18: PHẦN V - DẪN CHỨNG 2: J.K. ROWLING (ẢNH THẬT) -->
+    <div class="slide" data-section="PHẦN V" data-title="J.K. Rowling - Nghịch cảnh">
+      <div class="part-capsule step-item">PHẦN V — LIÊN HỆ THỰC TẾ: TỪ ĐỈNH CAO ĐẾN ĐỜI THƯỜNG</div>
+      <h2 class="slide-title step-item">2. Bền bỉ trước nghịch cảnh — J.K. Rowling</h2>
+
+      <div class="grid-duo" style="align-items: stretch; margin-bottom: 1.25rem;">
+        <div class="cinema-photo-card step-item">
+          <div class="cinema-photo-wrap" style="height: 190px;">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/5d/J._K._Rowling_2010.jpg/640px-J._K._Rowling_2010.jpg" alt="Nhà văn J.K. Rowling thật">
+          </div>
+          <div class="cinema-card-body">
+            <div class="card-title-lg">Hoàn cảnh người mẹ đơn thân</div>
+            <div class="card-content-p">
+              Trước khi cả thế giới say mê bộ truyện huyền thoại, J.K. Rowling từng là một người mẹ đơn thân rơi vào cảnh khánh kiệt, sống nương tựa vào trợ cấp xã hội ít ỏi, ôm con nhỏ trong quán cà phê lạnh lẽo để gõ từng dòng chữ trên máy đánh chữ cũ kỹ.
+            </div>
+          </div>
+        </div>
+
+        <div class="neo-card step-item" style="justify-content: center;">
+          <div class="card-title-lg" style="color: var(--accent-rose);">12 nhà xuất bản từ chối liên tiếp</div>
+          <div class="card-content-p">
+            Bản thảo tập đầu tiên của bộ truyện <em>Harry Potter</em> đã bị 12 nhà xuất bản liên tiếp từ chối thẳng thừng theo nội dung nguồn. Nhưng thái độ không để những lần khước từ trở thành dấu chấm hết đã giúp bà bước qua bóng tối của số phận để thay đổi lịch sử văn học thế giới.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 19: PHẦN V - DẪN CHỨNG 3: BƯỚC CHÂN THẦM LẶNG -->
+    <div class="slide" data-section="PHẦN V" data-title="Những bước chân thầm lặng">
+      <div class="part-capsule step-item">PHẦN V — LIÊN HỆ THỰC TẾ: TỪ ĐỈNH CAO ĐẾN ĐỜI THƯỜNG</div>
+      <h2 class="slide-title step-item">3. Những bước chân thầm lặng quanh ta</h2>
+
+      <p class="paragraph-body step-item">
+        Cảm hứng không chỉ đến từ những tượng đài xa xôi trên truyền thông, mà lấp lánh ngay trong cuộc sống thường nhật của những con người bình dị bên cạnh chúng ta:
+      </p>
+
+      <div class="grid-duo">
+        <div class="cinema-photo-card step-item">
+          <div class="cinema-photo-wrap" style="height: 140px;">
+            <img src="https://images.unsplash.com/photo-1524178232363-1fb2b075b655?auto=format&fit=crop&w=800&q=80" alt="Bảo vệ đề tài khoa học">
+          </div>
+          <div class="cinema-card-body" style="padding: 1rem;">
+            <div class="card-title-lg">Bạn học sinh can đảm trước hội đồng</div>
+            <div class="card-content-p">
+              Đó là người học sinh từng run rẩy toát mồ hôi khi nói trước tập thể, nhưng hôm nay đã dám hít một hơi thật sâu, đứng thẳng lưng trước hội đồng để tự tin bảo vệ đề tài nghiên cứu khoa học của chính mình.
+            </div>
+          </div>
+        </div>
+
+        <div class="cinema-photo-card step-item">
+          <div class="cinema-photo-wrap" style="height: 140px;">
+            <img src="https://images.unsplash.com/photo-1434030216411-0b793f4b4173?auto=format&fit=crop&w=800&q=80" alt="Học tập thâu đêm">
+          </div>
+          <div class="cinema-card-body" style="padding: 1rem;">
+            <div class="card-title-lg">Người trẻ kỷ luật thâu đêm</div>
+            <div class="card-content-p">
+              Đó là người bạn trẻ kiên quyết tắt đi màn hình phim ảnh giải trí hấp dẫn sau một ngày dài làm việc mệt mỏi, ngồi vào bàn học ngoại ngữ thêm 1 tiếng đồng hồ với khát khao mở rộng chân trời tương lai.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="neo-card step-item" style="margin-top: 1.25rem; border-left: 4px solid var(--primary-cyan); background: rgba(56, 189, 248, 0.1);">
+        <div style="font-family: var(--font-title); font-size: 1.25rem; color: #fff; text-align: center;">
+          “Họ đã dũng cảm chọn sự không thoải mái của ngày hôm nay để đánh đổi lấy sự vững vàng, tự chủ của ngày mai.”
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 20: PHẦN VI - RÀO CẢN 1: ÁP LỰC SINH KẾ -->
+    <div class="slide" data-section="PHẦN VI" data-title="Rào cản: Áp lực sinh kế">
+      <div class="part-capsule step-item">PHẦN VI — ĐỐI DIỆN VÀ PHẢN BIỆN THỰC TẾ</div>
+      <h2 class="slide-title step-item">Rào cản 1: Gánh nặng cơm áo gạo tiền</h2>
+
+      <div class="grid-duo">
+        <div class="neo-card step-item" style="border-left: 4px solid var(--accent-rose);">
+          <div class="badge-sub" style="background: rgba(244, 63, 94, 0.18); color: var(--accent-rose);">LUẬN ĐIỂM PHẢN BIỆN</div>
+          <div class="card-title-lg">Áp lực tài chính và trách nhiệm nuôi sống</div>
+          <div class="card-content-p">
+            Thực tế cuộc sống không phải một câu chuyện cổ tích màu hồng. Hóa đơn tiền nhà, tiền ăn, gánh nặng phụng dưỡng gia đình hàng tháng là những áp lực hiện hữu đầy khắc nghiệt. Việc mơ mộng viển vông mà không thể tự nuôi sống nổi bản thân chính là một sự vô trách nhiệm đối với chính mình và người thân.
+          </div>
+        </div>
+
+        <div class="neo-card step-item" style="border-left: 4px solid var(--primary-cyan);">
+          <div class="badge-sub" style="background: rgba(56, 189, 248, 0.18); color: var(--primary-cyan);">LỜI GIẢI THỰC TẾ</div>
+          <div class="card-title-lg">Chiến lược “Hai chiếc ví”</div>
+          <div class="card-content-p">
+            Ta không nhất thiết phải liều lĩnh đánh cược tất cả. Hãy tiếp cận bằng tư duy thực tế và cân bằng thông qua việc phân chia hai nguồn lực rõ ràng để vừa đảm bảo trách nhiệm sinh tồn vừa nuôi dưỡng ước mơ.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 21: PHẦN VI - CHI TIẾT HAI CHIẾC VÍ & NGƯỜI LAO ĐỘNG -->
+    <div class="slide" data-section="PHẦN VI" data-title="Chiến lược Hai chiếc ví">
+      <div class="part-capsule step-item">PHẦN VI — ĐỐI DIỆN VÀ PHẢN BIỆN THỰC TẾ</div>
+      <h2 class="slide-title step-item">Chiến lược “Hai chiếc ví” & Ước mơ người lao động</h2>
+
+      <div class="grid-duo">
+        <div class="neo-card step-item">
+          <div class="badge-sub">CHIẾC VÍ THỨ NHẤT</div>
+          <div class="card-title-lg">Công việc ổn định (Trách nhiệm sinh tồn)</div>
+          <div class="card-content-p">
+            Đảm nhận vai trò giải quyết các hóa đơn thường nhật, chu toàn trách nhiệm sinh tồn cơ bản và đóng vai trò làm điểm tựa tài chính vững vàng, không để bản thân rơi vào cảnh bấp bênh, khốn khó.
+          </div>
+        </div>
+
+        <div class="neo-card step-item">
+          <div class="badge-sub">CHIẾC VÍ THỨ HAI</div>
+          <div class="card-title-lg">Dự án ước mơ (Nuôi dưỡng tương lai)</div>
+          <div class="card-content-p">
+            Được âm thầm nuôi dưỡng bằng thời gian rảnh rỗi và nguồn lực tích lũy sau giờ làm. Dù chỉ là 1-2 tiếng mỗi ngày, nhưng đó là hạt giống để tạo đà bứt phá khi thời cơ chín muồi.
+          </div>
+        </div>
+      </div>
+
+      <div class="neo-card step-item" style="margin-top: 1.25rem; border-color: rgba(56, 189, 248, 0.4);">
+        <div class="card-title-lg" style="color: var(--primary-cyan);">Hình ảnh người lao động làm việc 12 tiếng mỗi ngày</div>
+        <div class="card-content-p">
+          Một người lao động làm việc 12 tiếng mỗi ngày với ước mơ giản dị: Thoát nghèo và cho con cái một tương lai tươi sáng hơn. Ước mơ ở bất kỳ quy mô nào, miễn là hướng về phía trước, đều mang giá trị tinh thần thiêng liêng và phẩm giá cao quý như nhau.
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 22: PHẦN VI - RÀO CẢN 2: CHÊNH LỆCH XUẤT PHÁT ĐIỂM -->
+    <div class="slide" data-section="PHẦN VI" data-title="Rào cản: Xuất phát điểm">
+      <div class="part-capsule step-item">PHẦN VI — ĐỐI DIỆN VÀ PHẢN BIỆN THỰC TẾ</div>
+      <h2 class="slide-title step-item">Rào cản 2: Sự chênh lệch xuất phát điểm và nguồn lực</h2>
+
+      <div class="grid-duo">
+        <div class="neo-card step-item" style="border-left: 4px solid var(--accent-rose);">
+          <div class="badge-sub" style="background: rgba(244, 63, 94, 0.18); color: var(--accent-rose);">LUẬN ĐIỂM PHẢN BIỆN</div>
+          <div class="card-title-lg">Bất bình đẳng về điều kiện xuất phát</div>
+          <div class="card-content-p">
+            Có những người sinh ra đã ở vạch đích, sở hữu sẵn nền tảng kinh tế gia đình vững mạnh, nguồn vốn dồi dào và mạng lưới quan hệ rộng khắp. Liệu có quá ngây thơ khi kêu gọi những người tay trắng, thiếu vốn, không quan hệ phải mơ lớn và cạnh tranh ngang hàng?
+          </div>
+        </div>
+
+        <div class="neo-card step-item" style="border-left: 4px solid var(--primary-cyan);">
+          <div class="badge-sub" style="background: rgba(56, 189, 248, 0.18); color: var(--primary-cyan);">LỜI GIẢI THỰC TẾ</div>
+          <div class="card-title-lg">Bản chất của sự nỗ lực</div>
+          <div class="card-content-p">
+            Sự bất bình đẳng về nguồn lực là một thực tế hiển nhiên, nhưng định nghĩa về thành công và giá trị sống của một đời người lại hoàn toàn không phụ thuộc vào điểm xuất phát của kẻ khác. Hãy hiểu đúng bản chất sự nỗ lực qua 3 nguyên lý sống.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 23: PHẦN VI - SOLO RACE (CÂY TRE MỌC TỪ MĂNG & HOA NỞ RA SỐNG ĐỘNG) -->
+    <div class="slide" data-section="PHẦN VI" data-title="Solo Race & Cây tre, hoa mận">
+      <div class="part-capsule step-item">PHẦN VI — ĐỐI DIỆN VÀ PHẢN BIỆN THỰC TẾ</div>
+      <h2 class="slide-title step-item">1. Cuộc đời là một Solo Race</h2>
+
+      <p class="paragraph-body step-item">
+        Không có một chuẩn thời gian chung nào buộc mọi con người phải thành công ở tuổi hai mươi hay ba mươi. Mỗi số phận có một múi giờ phát triển riêng biệt:
+      </p>
+
+      <div class="nature-art-container">
+        <!-- CÂY TRE MỌC VƯƠN TỪ BÚP MĂNG LÊN CAO -->
+        <div class="art-frame-bamboo step-item">
+          <svg class="svg-cinematic-bamboo" viewBox="0 0 320 220">
+            <defs>
+              <linearGradient id="bambooGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" stop-color="#059669"/>
+                <stop offset="50%" stop-color="#10b981"/>
+                <stop offset="100%" stop-color="#34d399"/>
+              </linearGradient>
+              <linearGradient id="earthGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+                <stop offset="0%" stop-color="#1e293b"/>
+                <stop offset="100%" stop-color="#090d16"/>
+              </linearGradient>
+            </defs>
+
+            <!-- Tầng địa chất ngầm rễ đâm sâu -->
+            <rect x="10" y="110" width="300" height="100" rx="8" fill="url(#earthGrad)" stroke="rgba(16,185,129,0.2)"/>
+            <text x="25" y="130" fill="#64748b" font-size="10" font-weight="700">TẦNG ĐỊA CHẤT NGẦM (NĂM 1-4)</text>
+
+            <g class="root-path-pulse" stroke="#34d399" stroke-width="2.5" fill="none">
+              <path d="M160 110 Q 140 140, 110 185 M160 110 Q 155 150, 160 200 M160 110 Q 185 145, 210 190"/>
+              <path d="M135 150 Q 115 170, 85 180 M185 150 Q 215 165, 235 180" stroke-width="1.8" stroke="#10b981"/>
+            </g>
+            <line x1="10" y1="110" x2="310" y2="110" stroke="#34d399" stroke-width="2"/>
+
+            <!-- CÂY TRE MỌC VƯƠN TỪ MĂNG -->
+            <g class="bamboo-shoot-grow">
+              <rect x="150" y="20" width="20" height="26" rx="3" fill="url(#bambooGrad)"/>
+              <rect x="150" y="49" width="20" height="27" rx="3" fill="url(#bambooGrad)"/>
+              <rect x="150" y="79" width="20" height="28" rx="3" fill="url(#bambooGrad)"/>
+              <line x1="148" y1="47" x2="172" y2="47" stroke="#6ee7b7" stroke-width="3"/>
+              <line x1="148" y1="77" x2="172" y2="77" stroke="#6ee7b7" stroke-width="3"/>
+              <path d="M170 47 Q 200 40, 220 50 M170 47 Q 195 30, 215 25" stroke="#34d399" stroke-width="2" fill="none"/>
+              <path d="M150 77 Q 120 70, 100 80 M150 77 Q 125 60, 105 55" stroke="#34d399" stroke-width="2" fill="none"/>
+            </g>
+          </svg>
+          <div class="card-title-lg" style="color: var(--accent-emerald); margin-top: 0.5rem;">Cây tre cắm sâu bộ rễ</div>
+          <div class="card-content-p" style="font-size: 0.92rem;">
+            Cây tre mất tới 4 năm đầu tiên chỉ để nhú lên mặt đất vài centimet, nhưng toàn bộ thời gian đó nó cắm sâu bộ rễ hàng chục mét dưới lòng đất. Đến năm thứ 5, nó bứt phá vươn cao hàng chục mét chỉ trong vài tuần ngắn ngủi[cite: 4].
+          </div>
+        </div>
+
+        <!-- BÔNG HOA NỞ RA RỰC RỠ -->
+        <div class="art-frame-flower step-item">
+          <svg class="svg-cinematic-flower" viewBox="0 0 300 220">
+            <defs>
+              <radialGradient id="petalGradPlum" cx="50%" cy="50%" r="50%">
+                <stop offset="0%" stop-color="#ffffff"/>
+                <stop offset="70%" stop-color="#fbcfe8"/>
+                <stop offset="100%" stop-color="#f43f5e"/>
+              </radialGradient>
+              <radialGradient id="centerPollen" cx="50%" cy="50%" r="50%">
+                <stop offset="0%" stop-color="#fef08a"/>
+                <stop offset="100%" stop-color="#f59e0b"/>
+              </radialGradient>
+            </defs>
+
+            <!-- CÁC CÁNH HOA BUNG NỞ TỪ TÂM -->
+            <g class="flower-bloom-active">
+              <ellipse cx="150" cy="85" rx="14" ry="26" fill="url(#petalGradPlum)"/>
+              <ellipse cx="150" cy="155" rx="14" ry="26" fill="url(#petalGradPlum)"/>
+              <ellipse cx="115" cy="120" rx="26" ry="14" fill="url(#petalGradPlum)"/>
+              <ellipse cx="185" cy="120" rx="26" ry="14" fill="url(#petalGradPlum)"/>
+
+              <ellipse cx="125" cy="95" rx="15" ry="24" transform="rotate(-45 125 95)" fill="url(#petalGradPlum)" opacity="0.95"/>
+              <ellipse cx="175" cy="145" rx="15" ry="24" transform="rotate(-45 175 145)" fill="url(#petalGradPlum)" opacity="0.95"/>
+              <ellipse cx="175" cy="95" rx="15" ry="24" transform="rotate(45 175 95)" fill="url(#petalGradPlum)" opacity="0.95"/>
+              <ellipse cx="125" cy="145" rx="15" ry="24" transform="rotate(45 125 145)" fill="url(#petalGradPlum)" opacity="0.95"/>
+
+              <circle cx="150" cy="120" r="14" fill="url(#centerPollen)" filter="drop-shadow(0 0 8px #f59e0b)"/>
+              <circle cx="145" cy="115" r="2" fill="#fff"/>
+              <circle cx="155" cy="115" r="2" fill="#fff"/>
+              <circle cx="150" cy="125" r="2" fill="#fff"/>
+            </g>
+          </svg>
+          <div class="card-title-lg" style="color: var(--accent-rose); margin-top: 0.5rem;">Quy luật hoa mận & hoa hồng</div>
+          <div class="card-content-p" style="font-size: 0.92rem;">
+            Hoa mận không thể nở giữa mùa hè chói chang, và hoa hồng cũng không bao giờ khoe sắc giữa mùa đông giá rét. Mỗi loài hoa đều có thời điểm bừng nở rực rỡ của riêng mình, và con người cũng vậy[cite: 4].
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 24: PHẦN VI - VƯỢT QUA CHÍNH MÌNH -->
+    <div class="slide" data-section="PHẦN VI" data-title="Vượt qua chính mình & Ý chí">
+      <div class="part-capsule step-item">PHẦN VI — ĐỐI DIỆN VÀ PHẢN BIỆN THỰC TẾ</div>
+      <h2 class="slide-title step-item">Vượt qua chính mình & Quyết định đường dài</h2>
+
+      <div class="grid-duo">
+        <div class="neo-card step-item">
+          <div class="badge-sub">NGUYÊN LÝ 2</div>
+          <div class="card-title-lg">“Bước ra” là vượt qua chính mình</div>
+          <div class="card-content-p">
+            Đích đến tối thượng của việc “bước ra khỏi vùng an toàn” không phải là để chiến thắng hay hạ bệ người khác. Mục tiêu duy nhất và vinh quang nhất là chiến thắng sự lười biếng, đập tan thói quen trì hoãn và vượt lên chính nỗi sợ hãi của bản thân mình ngày hôm qua.
+          </div>
+        </div>
+
+        <div class="neo-card step-item">
+          <div class="badge-sub">NGUYÊN LÝ 3</div>
+          <div class="card-title-lg">Năng khiếu là khởi đầu, ý chí quyết định đường dài</div>
+          <div class="card-content-p">
+            Xuất phát điểm tạo lợi thế ban đầu nhưng sự tôi luyện qua năm tháng quyết định hành trình tới đích. Chính sự tôi luyện bền bỉ qua năm tháng, kỷ luật thép và ý chí kiên định mới là yếu tố quyết định ai chạm đến vạch đích.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 25: PHẦN VII - ÁNH MẮT NHÌN LÊN BẦU TRỜI -->
+    <div class="slide" data-section="PHẦN VII" data-title="Bản lĩnh kết hợp sinh tồn">
+      <div class="part-capsule step-item">PHẦN VII — LỜI KẾT: BƯỚC LÊN SÂN KHẤU CUỘC ĐỜI</div>
+      <h2 class="slide-title step-item">Ánh mắt nhìn lên bầu trời</h2>
+
+      <div class="neo-card step-item" style="border-left: 4px solid var(--primary-cyan); background: rgba(30, 58, 138, 0.4); margin-bottom: 1.5rem;">
+        <div style="font-family: var(--font-title); font-size: 1.35rem; color: #fff; text-align: center;">
+          “Cơm áo gạo tiền có thể thử thách đôi chân nhưng không có quyền giam cầm ánh mắt nhìn lên bầu trời.”
+        </div>
+      </div>
+
+      <div class="neo-card step-item" style="background: radial-gradient(circle at center, rgba(37, 99, 235, 0.25), rgba(8, 17, 40, 0.95)); border-color: var(--primary-cyan);">
+        <div class="card-title-lg" style="color: var(--primary-cyan); font-size: 1.3rem;">Bản lĩnh kết hợp sinh tồn với khát vọng</div>
+        <div class="card-content-p" style="font-size: 1.12rem; color: #f8fafc;">
+          Người có bản lĩnh thực sự không phải là người rũ bỏ hiện thực một cách ngây thơ, mà là người biết <strong>kết hợp trách nhiệm sinh tồn với khát vọng</strong>. Họ vừa giữ vững đôi chân bám chắc trên mặt đất hiện thực, vừa không ngừng hướng ánh nhìn kiêu hãnh lên những vì sao.
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 26: PHẦN VII - CÁI GIÁ AN TOÀN VÔ VỊ -->
+    <div class="slide" data-section="PHẦN VII" data-title="Kỷ luật & Cuộc đời nhạt nhòa">
+      <div class="part-capsule step-item">PHẦN VII — LỜI KẾT: BƯỚC LÊN SÂN KHẤU CUỘC ĐỜI</div>
+      <h2 class="slide-title step-item">Cái giá của sự an toàn vô vị</h2>
+
+      <div class="grid-duo">
+        <div class="neo-card step-item">
+          <div class="card-title-lg">Cuộc đời nhạt nhòa & Giấc mơ dang dở</div>
+          <div class="card-content-p">
+            Một cuộc đời trôi qua trong an toàn tuyệt đối sẽ là một chuỗi những ngày dài vô vị, để rồi khi nhìn lại chỉ còn nỗi tiếc nuối muộn màng về những ước mơ dang dở. Nỗi đau né tránh hôm nay sẽ tích tụ thành vết thương ân hận sâu sắc của ngày mai.
+          </div>
+        </div>
+
+        <div class="neo-card step-item" style="border-color: var(--primary-cyan);">
+          <div class="card-title-lg" style="color: var(--primary-cyan);">Kỷ luật sắt đá: Chiếc cầu nối duy nhất</div>
+          <div class="card-content-p">
+            Ước mơ không thể tự nó biến thành thành tựu nếu thiếu đi hành động kiên trì. Chính kỷ luật sắt đá đóng vai trò như chiếc cầu nối giữa khát vọng và vinh quang rực rỡ ngoài đời thực.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 27: PHẦN VII - HAI SỰ LỰA CHỌN -->
+    <div class="slide" data-section="PHẦN VII" data-title="Hai sự lựa chọn">
+      <div class="part-capsule step-item">PHẦN VII — LỜI KẾT: BƯỚC LÊN SÂN KHẤU CUỘC ĐỜI</div>
+      <h2 class="slide-title step-item">Hai sự lựa chọn</h2>
+
+      <div class="quote-cinematic-banner step-item" style="text-align: center; border-left: none; background: transparent;">
+        “Ngay tại giây phút này, bạn luôn có hai sự lựa chọn:”
+      </div>
+
+      <div class="grid-duo">
+        <div class="neo-card step-item" style="border-color: rgba(244, 63, 94, 0.4);">
+          <div class="badge-sub" style="background: rgba(244, 63, 94, 0.2); color: var(--accent-rose);">LỰA CHỌN THỨ NHẤT</div>
+          <div class="card-title-lg">Khán giả của cuộc đời</div>
+          <div class="card-content-p" style="font-size: 1.05rem;">
+            Tiếp tục ngồi đó, nuông chiều sự sợ hãi và làm khán giả tán thưởng cuộc đời người khác.
+          </div>
+        </div>
+
+        <div class="neo-card step-item" style="border-color: var(--primary-cyan); background: rgba(14, 165, 233, 0.15);">
+          <div class="badge-sub" style="background: var(--primary-cyan); color: #02050f;">LỰA CHỌN THỨ HAI</div>
+          <div class="card-title-lg">Nhân vật chính trên sân khấu</div>
+          <div class="card-content-p" style="font-size: 1.05rem; color: #ffffff;">
+            Đứng dậy, xóa bỏ lời ngụy biện, bước lên sân khấu và tự tay cầm lái vận mệnh.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 28: KẾT THÚC BÀI THUYẾT TRÌNH -->
+    <div class="slide" data-section="PHẦN VII" data-title="Đã đến lúc bước ra!">
+      <div style="text-align: center; max-width: 960px; margin: 0 auto;">
+        <div class="part-capsule">THÔNG ĐIỆP KẾT THÚC</div>
+        
+        <h1 class="slide-title" style="font-size: 4.8rem; line-height: 1.1; margin-bottom: 2rem; background: linear-gradient(135deg, #ffffff 10%, #38bdf8 60%, #60a5fa 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; text-shadow: 0 0 40px rgba(56, 189, 248, 0.8);">
+          ĐÃ ĐẾN LÚC BƯỚC RA!
+        </h1>
+
+        <p class="paragraph-body" style="font-size: 1.4rem; color: #cbd5e1; max-width: 780px; margin: 0 auto 2.5rem;">
+          Cơm áo gạo tiền không có quyền giam cầm ánh mắt nhìn lên bầu trời. Hãy đứng dậy, dấn thân và tự tay cầm lái vận mệnh của chính bạn!
+        </p>
+
+        <div>
+          <button class="btn-step" onclick="event.stopPropagation(); goToSlide(0);" style="padding: 0.95rem 2.8rem; font-size: 1.05rem; background: var(--primary-cyan); color: #02050f;">
+            ↺ Xem lại từ đầu bài thuyết trình
+          </button>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- FOOTER -->
+  <footer>
+    <div style="display: flex; gap: 0.6rem; align-items: center;">
+      <button class="btn-step" id="btnPrevSlide" onclick="prevSlide()">← Trước</button>
+      <button class="btn-step" id="btnNextSlide" onclick="nextSlide()">Sau →</button>
+      <span class="step-counter-tag" id="stepIndicatorLabel">Ý 1 / 1</span>
+    </div>
+
+    <div class="progress-line-track">
+      <div class="progress-line-fill" id="progressFill"></div>
+    </div>
+
+    <div style="display: flex; align-items: center; gap: 1.5rem;">
+      <span style="font-size: 0.85rem; font-weight: 700; color: var(--text-sub);" id="slideNumberDisplay">Slide 1 / 28</span>
+    </div>
+  </footer>
+
+  <!-- MODAL MỤC LỤC -->
+  <div class="toc-modal-wrap" id="tocModal">
+    <div class="toc-modal-core">
+      <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 1rem;">
+        <h3 style="font-family: var(--font-title); font-size: 1.5rem; color: #fff;">Danh sách 28 Slide bài nói</h3>
+        <button class="btn-header" id="btnCloseTocModal">Đóng ✕</button>
+      </div>
+      <div class="toc-grid" id="tocGridList"></div>
+    </div>
+  </div>
+
+  <script>
+    // 1. Quản lý Slides, Reveal Steps & Pop-up Focus
+    const slides = document.querySelectorAll('.slide');
+    const totalSlides = slides.length;
+    let currentSlide = 0;
+    let currentStepIndex = 0;
+
+    const progressFill = document.getElementById('progressFill');
+    const slideNumberDisplay = document.getElementById('slideNumberDisplay');
+    const sectionLabelTop = document.getElementById('sectionLabelTop');
+    const btnPrevSlide = document.getElementById('btnPrevSlide');
+    const btnNextSlide = document.getElementById('btnNextSlide');
+    const stepIndicatorLabel = document.getElementById('stepIndicatorLabel');
+
+    const tocModal = document.getElementById('tocModal');
+    const btnOpenTocModal = document.getElementById('btnOpenTocModal');
+    const btnCloseTocModal = document.getElementById('btnCloseTocModal');
+    const tocGridList = document.getElementById('tocGridList');
+    const btnToggleFullscreen = document.getElementById('btnToggleFullscreen');
+    const slidesClickTrigger = document.getElementById('slidesClickTrigger');
+
+    // 2. Halo con trỏ chuột
+    const pointerHalo = document.getElementById('pointerHalo');
+    window.addEventListener('pointermove', e => {
+      pointerHalo.style.transform = `translate3d(${e.clientX - 130}px, ${e.clientY - 130}px, 0)`;
+      pointerHalo.classList.add('visible');
+    }, { passive: true });
+    window.addEventListener('pointerleave', () => pointerHalo.classList.remove('visible'));
+
+    // 3. Mở màn trình diễn
+    const curtainStage = document.getElementById('curtainStage');
+    const btnPlayKeynote = document.getElementById('btnPlayKeynote');
+
+    function openCurtain() {
+      curtainStage.classList.add('curtain-opened');
+      initCurrentSlideSteps();
+      setTimeout(() => {
+        curtainStage.style.display = 'none';
+      }, 1200);
+    }
+    btnPlayKeynote.addEventListener('click', openCurtain);
+
+    // 4. Cơ chế hiển thị từng ý (PowerPoint-style Step Reveal)
+    function getCurrentSlideSteps() {
+      return slides[currentSlide].querySelectorAll('.step-item');
+    }
+
+    function updateStepIndicator() {
+      const steps = getCurrentSlideSteps();
+      if (steps.length === 0 || currentSlide === 0 || currentSlide === totalSlides - 1) {
+        stepIndicatorLabel.textContent = `Trọn vẹn`;
+        return;
+      }
+      stepIndicatorLabel.textContent = `Ý ${Math.min(currentStepIndex + 1, steps.length)} / ${steps.length}`;
+    }
+
+    function clearManualFocus() {
+      document.querySelectorAll('.manual-focus').forEach(el => el.classList.remove('manual-focus'));
+    }
+
+    function initCurrentSlideSteps() {
+      clearManualFocus();
+      const steps = getCurrentSlideSteps();
+
+      // Trang 1 và trang kết thúc: hiện đầy đủ ngay lập tức
+      if (currentSlide === 0 || currentSlide === totalSlides - 1) {
+        steps.forEach(s => {
+          s.classList.add('revealed');
+          s.classList.remove('active-step');
+        });
+        currentStepIndex = steps.length;
+      } else {
+        steps.forEach(s => s.classList.remove('revealed', 'active-step'));
+        currentStepIndex = 0;
+        if (steps.length > 0) {
+          steps[0].classList.add('revealed', 'active-step');
+        }
+      }
+      updateStepIndicator();
+    }
+
+    function advanceStepOrSlide() {
+      if (curtainStage && !curtainStage.classList.contains('curtain-opened')) {
+        openCurtain();
+        return;
+      }
+
+      // Nếu đang ở Slide 1: Chuyển ngay qua Slide 2
+      if (currentSlide === 0) {
+        nextSlide();
+        return;
+      }
+
+      const activeSlideElem = slides[currentSlide];
+      const steps = getCurrentSlideSteps();
+
+      // ĐẶC BIỆT: Slide 13 (Lộ trình chiến lược) -> 1 click hiện cả 3 Bước 1, 2, 3
+      if (activeSlideElem.getAttribute('data-auto-sequence') === 'true') {
+        const unrevealed = Array.from(steps).filter(s => !s.classList.contains('revealed'));
+        if (unrevealed.length > 0) {
+          steps.forEach(s => s.classList.add('revealed'));
+          currentStepIndex = steps.length - 1;
+          updateStepIndicator();
+          return;
+        } else {
+          nextSlide();
+          return;
+        }
+      }
+
+      // Các slide bình thường: mở từng ý kế tiếp
+      if (currentStepIndex + 1 < steps.length) {
+        currentStepIndex++;
+        steps.forEach((s, i) => {
+          s.classList.remove('active-step');
+          if (i < currentStepIndex) {
+            s.classList.add('revealed');
+          } else if (i === currentStepIndex) {
+            s.classList.add('revealed', 'active-step');
+            s.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+          }
+        });
+        updateStepIndicator();
+        return;
+      }
+
+      // Đã hiện hết ý -> Chuyển sang slide kế tiếp bình thường
+      nextSlide();
+    }
+
+    // BẮT SỰ KIỆN CLICK: CLICK VÀO KHUNG MỚI PHÓNG TO, CLICK NGOÀI THÌ TIẾP TỤC
+    slidesClickTrigger.addEventListener('click', (e) => {
+      if (e.target.closest('button, a, .toc-modal-wrap')) return;
+
+      const card = e.target.closest('.neo-card, .cinema-photo-card, .art-frame-bamboo, .art-frame-flower');
+      
+      // Nếu click trực tiếp vào một khung nội dung -> Phóng to / Nhô lên
+      if (card && card.classList.contains('revealed')) {
+        const isAlreadyFocused = card.classList.contains('manual-focus');
+        clearManualFocus();
+        if (!isAlreadyFocused) {
+          card.classList.add('manual-focus');
+        }
+        return;
+      }
+
+      // Nếu click vào khoảng trống -> Bỏ phóng to (nếu có) và tiến bước bình thường
+      clearManualFocus();
+      advanceStepOrSlide();
+    });
+
+    // 5. Cập nhật Slide
+    function showSlide(index) {
+      if (index < 0 || index >= totalSlides) return;
+      slides.forEach((s, idx) => {
+        s.classList.toggle('active', idx === index);
+        if (idx === index) s.scrollTop = 0;
+      });
+      currentSlide = index;
+
+      slideNumberDisplay.textContent = `Slide ${index + 1} / ${totalSlides}`;
+      progressFill.style.width = `${((index + 1) / totalSlides) * 100}%`;
+
+      const activeSlide = slides[index];
+      const sec = activeSlide.getAttribute('data-section') || 'BÀI NÓI';
+      const tit = activeSlide.getAttribute('data-title') || '';
+      sectionLabelTop.textContent = `${sec} — ${tit}`;
+
+      btnPrevSlide.disabled = index === 0;
+      btnNextSlide.disabled = index === totalSlides - 1;
+
+      initCurrentSlideSteps();
+    }
+
+    function nextSlide() {
+      if (currentSlide < totalSlides - 1) showSlide(currentSlide + 1);
+    }
+
+    function prevSlide() {
+      if (currentSlide > 0) showSlide(currentSlide - 1);
+    }
+
+    function goToSlide(index) {
+      showSlide(index);
+      tocModal.classList.remove('open');
+    }
+
+    // 6. Phím tắt
+    window.addEventListener('keydown', (e) => {
+      if (tocModal.classList.contains('open')) {
+        if (e.key === 'Escape') tocModal.classList.remove('open');
+        return;
+      }
+      if (curtainStage && !curtainStage.classList.contains('curtain-opened')) {
+        if (e.key === ' ' || e.key === 'Enter') {
+          e.preventDefault();
+          openCurtain();
+        }
+        return;
+      }
+
+      if (['ArrowRight', ' ', 'PageDown'].includes(e.key)) {
+        e.preventDefault();
+        clearManualFocus();
+        advanceStepOrSlide();
+      } else if (['ArrowLeft', 'PageUp'].includes(e.key)) {
+        e.preventDefault();
+        clearManualFocus();
+        prevSlide();
+      } else if (e.key === 'Home') {
+        e.preventDefault();
+        goToSlide(0);
+      } else if (e.key === 'End') {
+        e.preventDefault();
+        goToSlide(totalSlides - 1);
+      } else if (e.key.toLowerCase() === 'f') {
+        toggleFullscreen();
+      }
+    });
+
+    // 7. Tạo Menu Mục Lục Động
+    slides.forEach((slide, idx) => {
+      const sec = slide.getAttribute('data-section') || `Phần ${idx + 1}`;
+      const tit = slide.getAttribute('data-title') || `Slide ${idx + 1}`;
+      const item = document.createElement('div');
+      item.className = 'toc-item-btn';
+      item.innerHTML = `
+        <span style="color: var(--primary-cyan); font-weight: 800; font-size: 0.85rem;">${idx + 1 < 10 ? '0' + (idx + 1) : idx + 1}</span>
+        <div>
+          <div style="font-size: 0.72rem; color: var(--text-sub); text-transform: uppercase;">${sec}</div>
+          <div style="font-weight: 600; color: #fff; font-size: 0.9rem;">${tit}</div>
+        </div>
+      `;
+      item.onclick = () => goToSlide(idx);
+      tocGridList.appendChild(item);
+    });
+
+    btnOpenTocModal.onclick = () => tocModal.classList.add('open');
+    btnCloseTocModal.onclick = () => tocModal.classList.remove('open');
+    tocModal.onclick = (e) => { if (e.target === tocModal) tocModal.classList.remove('open'); };
+
+    function toggleFullscreen() {
+      if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen().catch(() => {});
+      } else if (document.exitFullscreen) {
+        document.exitFullscreen();
+      }
+    }
+    btnToggleFullscreen.onclick = toggleFullscreen;
+
+    // 8. Canvas Bụi Sao
+    const canvas = document.getElementById('spaceCanvas');
+    const ctx = canvas.getContext('2d');
+    let stars = [];
+
+    function resizeCanvas() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+
+    for (let i = 0; i < 45; i++) {
+      stars.push({
+        x: Math.random() * canvas.width,
+        y: Math.random() * canvas.height,
+        r: Math.random() * 1.6 + 0.4,
+        vx: (Math.random() - 0.5) * 0.3,
+        vy: (Math.random() - 0.5) * 0.3,
+        a: Math.random() * 0.6 + 0.2
+      });
+    }
+
+    function animateSpace() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      stars.forEach(p => {
+        p.x += p.vx;
+        p.y += p.vy;
+        if (p.x < 0 || p.x > canvas.width) p.vx *= -1;
+        if (p.y < 0 || p.y > canvas.height) p.vy *= -1;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(56, 189, 248, ${p.a})`;
+        ctx.fill();
+      });
+      requestAnimationFrame(animateSpace);
+    }
+    animateSpace();
+
+    // Khởi tạo
+    showSlide(0);
+  </script>
+</body>
+</html>
